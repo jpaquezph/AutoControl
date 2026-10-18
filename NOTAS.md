@@ -1,5 +1,9 @@
 # AutoControl — notas para retomar
 
+> **Desde el 18/10/2026 se trabaja solo en la APK.** La web quedó congelada en la 1.2 (anda, pero no se
+> actualiza ni se prueba). `AutoControl.html` sigue siendo el código de la APK. Las APK nuevas se dejan en
+> el escritorio (`AutoControl-X.Y.apk`) y el usuario las pasa al celular. La sincronización web↔APK quedó en pausa.
+
 App para llevar los controles del auto (kilometraje, service, historial, combustible, patentes,
 papeles, mecánicos, gastos) + GPS que cuenta km + mapa con navegación. Mismo estilo que Kakeibo.
 

@@ -2,15 +2,18 @@ package ar.autocontrol;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.PictureInPictureParams;
 import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.Rational;
 import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.view.WindowManager;
@@ -51,6 +54,7 @@ public class MainActivity extends Activity {
     private Uri fotoCamara;
     private TextToSpeech voz;
     private boolean vozLista;
+    private boolean mapaAbierto;   // con el mapa abierto, salir de la app la achica a una ventanita
 
     @Override
     protected void onCreate(Bundle estado) {
@@ -194,6 +198,31 @@ public class MainActivity extends Activity {
         }
     }
 
+    /** Ventanita flotante (imagen en imagen) con el mapa: Android 8 o mas nuevo. */
+    private PictureInPictureParams parametrosPip() {
+        PictureInPictureParams.Builder b = new PictureInPictureParams.Builder().setAspectRatio(new Rational(3, 4));
+        if (Build.VERSION.SDK_INT >= 31) b.setAutoEnterEnabled(mapaAbierto).setSeamlessResizeEnabled(false);
+        return b.build();
+    }
+
+    private boolean entrarPip() {
+        if (Build.VERSION.SDK_INT < 26 || isInPictureInPictureMode()) return false;
+        try { return enterPictureInPictureMode(parametrosPip()); } catch (Exception e) { return false; }
+    }
+
+    @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        // En Android 12+ entra solo (setAutoEnterEnabled); antes hay que pedirlo al apretar Inicio.
+        if (mapaAbierto && Build.VERSION.SDK_INT >= 26 && Build.VERSION.SDK_INT < 31) entrarPip();
+    }
+
+    @Override
+    public void onPictureInPictureModeChanged(boolean pip, Configuration conf) {
+        super.onPictureInPictureModeChanged(pip, conf);
+        web.evaluateJavascript("window.modoPip && modoPip(" + pip + ")", null);
+    }
+
     @Override
     public void onBackPressed() {
         if (web.canGoBack()) web.goBack();
@@ -226,6 +255,21 @@ public class MainActivity extends Activity {
 
     /** Funciones que la pagina llama como window.Android.* */
     private class Puente {
+        @JavascriptInterface
+        public void mapaAbierto(final boolean abierto) {
+            runOnUiThread(() -> {
+                mapaAbierto = abierto;
+                if (Build.VERSION.SDK_INT >= 26) try { setPictureInPictureParams(parametrosPip()); } catch (Exception e) { }
+            });
+        }
+
+        @JavascriptInterface
+        public void minimizar() {
+            runOnUiThread(() -> {
+                if (!entrarPip()) moveTaskToBack(true);
+            });
+        }
+
         @JavascriptInterface
         public void pantalla(final boolean encendida) {
             runOnUiThread(() -> {

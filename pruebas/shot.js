@@ -17,7 +17,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await cmd('Page.enable'); await cmd('Page.navigate', {url});
   await sleep(+wait);
   const t = await cmd('Runtime.evaluate', {expression:'document.title + " | " + ((document.getElementById("LOG")||{}).textContent||"")', returnByValue:true});
-  console.log(t.result.value.slice(0, 400));
+  console.log(t.result.value.slice(0, 3000));
   const s = await cmd('Page.captureScreenshot', {format:'png'});
   fs.writeFileSync(out, Buffer.from(s.data, 'base64'));
   ws.close(); ed.kill(); setTimeout(() => { try{ fs.rmSync(prof, {recursive:true, force:true}); }catch(e){} process.exit(0); }, 800);

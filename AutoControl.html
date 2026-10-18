@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="lib/leaflet.css" onerror="this.onerror=null;this.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css'">
 <script src="lib/leaflet.js"></script>
 <script>window.L || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"><\/script>')</script>
+<script src="lib/leaflet-rotate.js"></script>
+<script>window.L && !L.Map.prototype.setBearing && document.write('<script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate.js"><\/script>')</script>
 <style>
 /* Misma filosofia que Kakeibo: fondo calido, un color de identidad por seccion,
    verde/rojo semanticos siempre con icono + texto, esquinas redondeadas. */
@@ -301,6 +303,30 @@ a.btn{text-decoration:none}
 .nav-pie .grow{flex:1}
 .nav-pie b{font-size:18px}
 .m-yo{width:22px;height:22px;border-radius:50%;background:#2A78D6;border:3px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.35)}
+.m-flecha{width:34px;height:34px;display:grid;place-items:center;transform:rotate(var(--rot,0deg));filter:drop-shadow(0 1px 3px rgba(0,0,0,.4))}
+.mapa-brujula{position:absolute;right:12px;bottom:calc(var(--sheet-h,0px) + 66px);z-index:1000;display:grid;place-items:center;cursor:pointer;transition:bottom .15s}
+.mapa-brujula .ic{transform:rotate(var(--rot,0deg))}
+.mapa-brujula.on{color:#2A78D6}
+.mapa-odo{position:absolute;left:12px;bottom:calc(var(--sheet-h,0px) + 14px);z-index:1000;display:flex;align-items:center;gap:10px;padding:6px 12px 6px 6px;border-radius:14px;background:var(--surf);color:var(--tx);box-shadow:0 2px 10px rgba(0,0,0,.18);transition:bottom .15s;pointer-events:none;line-height:1.15}
+.mapa-odo .vel{min-width:44px;height:44px;border-radius:50%;border:3px solid #2A78D6;display:grid;place-items:center;font-weight:700;font-size:16px;padding:0 4px}
+.mapa-odo .vel small{display:block;font-size:9px;font-weight:500;color:var(--tx2);margin-top:-3px}
+.mapa-odo b{display:block;font-size:17px;font-variant-numeric:tabular-nums}
+.mapa-odo span{display:block;font-size:11.5px;color:var(--tx2)}
+.mapa-odo .rec{color:#0F8A50;font-weight:600}
+/* Ventanita flotante (Android, imagen en imagen): solo mapa, odómetro y la próxima indicación */
+body.pip .mapa-top,body.pip .mapa-chips,body.pip .mapa-fab,body.pip .mapa-brujula,body.pip .leaflet-control-container,body.pip .nav-pie,body.pip .toast,body.pip .app,body.pip .topbar{display:none!important}
+body.pip .mapa-sheet{max-height:none;padding:0;border-radius:0;box-shadow:none;background:transparent;top:0;bottom:auto}
+body.pip .mapa:not(.navegando) .mapa-sheet{display:none}
+body.pip .nav-ins{margin:0;padding:6px 8px;gap:8px;border-radius:0}
+body.pip .nav-fl{width:30px;height:30px;border-radius:8px}
+body.pip .nav-fl .ic{width:20px;height:20px}
+body.pip .nav-d{font-size:15px}
+body.pip .nav-t{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.pip .mapa-odo{left:6px;bottom:6px;padding:3px 8px 3px 3px;gap:6px;border-radius:10px}
+body.pip .mapa-odo .vel{min-width:30px;height:30px;font-size:12px;border-width:2px}
+body.pip .mapa-odo .vel small{display:none}
+body.pip .mapa-odo b{font-size:13px}
+body.pip .mapa-odo span{font-size:10px}
 .m-pin{width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#E4483F;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);display:grid;place-items:center;color:#fff}
 .m-pin .ic{transform:rotate(45deg)}
 .m-pin.sel{background:#2A78D6;width:36px;height:36px}
@@ -308,7 +334,7 @@ a.btn{text-decoration:none}
 .m-ini{width:14px;height:14px;border-radius:50%;background:#fff;border:4px solid #0F8A50;box-shadow:0 1px 4px rgba(0,0,0,.3)}
 .leaflet-container{font:inherit;background:var(--surf2)}
 .leaflet-bar a{background:var(--surf);color:var(--tx);border-color:var(--border)}
-.mapa .leaflet-bottom.leaflet-right{bottom:calc(var(--sheet-h,0px) + 64px);transition:bottom .15s}
+.mapa .leaflet-bottom.leaflet-right{bottom:calc(var(--sheet-h,0px) + 118px);transition:bottom .15s}
 .mapa .leaflet-control-attribution{font-size:10px}
 body.con-mapa{overflow:hidden}
 body.con-mapa .app,body.con-mapa .topbar{visibility:hidden}
@@ -367,10 +393,13 @@ body.con-mapa .app,body.con-mapa .topbar{visibility:hidden}
   <div class="mapa-top">
     <button class="ibtn" data-a="mapaCerrar" aria-label="Volver" title="Volver"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
     <form class="mapa-busca" id="mapaBusca" role="search"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="mapaQ" type="search" placeholder="Buscar dirección o lugar" autocomplete="off" enterkeyhint="search" aria-label="Buscar dirección o lugar"></form>
+    <button class="ibtn" data-a="mapaMinimizar" id="mapaMinBtn" hidden aria-label="Achicar a ventanita" title="Achicar a ventanita (el mapa queda a la vista)"><svg class="ic" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><rect x="12" y="12" width="7" height="6" rx="1" fill="currentColor"/></svg></button>
     <button class="ibtn" data-a="mapaCapa" id="mapaCapaBtn" aria-label="Ver satélite" title="Ver satélite"><svg class="ic" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg></button>
   </div>
   <div class="mapa-chips" id="mapaChips"></div>
   <button class="mapa-fab" data-a="mapaYo" id="mapaYoBtn" aria-label="Centrar en mi ubicación" title="Centrar en mi ubicación"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
+  <button class="mapa-fab mapa-brujula" data-a="mapaRumbo" id="mapaRumboBtn" aria-label="Orientación del mapa" title="Orientación del mapa"><svg class="ic" width="20" height="20" viewBox="0 0 24 24"><path d="M12 2l5 10h-10z" fill="#E4483F"/><path d="M12 22l-5-10h10z" fill="currentColor" opacity=".45"/></svg></button>
+  <div class="mapa-odo" id="mapaOdo" hidden></div>
   <div class="mapa-sheet" id="mapaSheet"></div>
 </div>
 <div class="modal" id="modal"></div>
@@ -381,7 +410,7 @@ body.con-mapa .app,body.con-mapa .topbar{visibility:hidden}
 "use strict";
 /* ================== Datos ================== */
 // Versión de la app: única fuente; android/build.sh la usa como versionName del APK.
-const APP_VERSION = '1.1';
+const APP_VERSION = '1.2';
 const KEY = 'autocontrol.v1';
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 const COLS = ['vehiculos','km','plan','historial','combustible','patentes','papeles','mecanicos','gastos','viajes'];
@@ -1051,7 +1080,8 @@ const CERCA = [
 const lugarMec = m => m.lat != null ? `${m.lat},${m.lng}` : (m.direccion || '');
 const AZUL = '#2A78D6', VERDE = '#0F8A50';
 const M = {map:null, capas:null, capa:'calles', yo:null, yoAcc:null, vivo:null, grupo:null, trazo:null, seguir:true, watch:null,
-  res:[], sel:null, ruta:null, modo:'driving', nav:null, voz:true, rerutaT:0, pendiente:null, oscuro:null};
+  res:[], sel:null, ruta:null, modo:'driving', nav:null, voz:true, rerutaT:0, pendiente:null, oscuro:null,
+  rumboAuto:true, giroObj:0, giroRaf:0, giroT:0, volverT:0};
 const mapaVisible = () => !document.getElementById('mapa').hidden;
 const temaOscuro = () => { const t = document.documentElement.dataset.theme; return t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; };
 function capasBase(){
@@ -1072,11 +1102,18 @@ function mapaInit(){
     if(M.oscuro !== temaOscuro()){ M.map.removeLayer(M.capas[M.capa]); M.capas = capasBase(); M.capas[M.capa].addTo(M.map); M.oscuro = temaOscuro(); }
     return true;
   }
-  M.map = L.map('mapaMap', {zoomControl:false}).setView([-34.6037, -58.3816], 12);
+  // leaflet-rotate: el mapa gira con el rumbo del auto (sin gestos de rotacion, para no girarlo sin querer).
+  M.map = L.map('mapaMap', {zoomControl:false, rotate:!!L.Map.prototype.setBearing, rotateControl:false, touchRotate:false, shiftKeyRotate:false, bearing:0}).setView([-34.6037, -58.3816], 12);
+  if(!M.map.setBearing) document.getElementById('mapaRumboBtn').hidden = true;
+  M.map.on('rotate', mapaRumboUI);
   L.control.zoom({position:'bottomright'}).addTo(M.map);
   M.capas = capasBase(); M.capas.calles.addTo(M.map); M.oscuro = temaOscuro();
   M.trazo = L.layerGroup().addTo(M.map); M.grupo = L.layerGroup().addTo(M.map);
-  M.map.on('dragstart', () => { M.seguir = false; mapaFab(); });
+  M.map.on('dragstart', () => {
+    M.seguir = false; mapaFab(); clearTimeout(M.volverT);
+    // Manejando, si moviste el mapa con el dedo vuelve solo a seguir al auto a los 15 s.
+    if(M.nav || gpsOn()) M.volverT = setTimeout(() => { if(mapaVisible() && (M.nav || gpsOn())){ M.seguir = true; mapaPos(); } }, 15000);
+  });
   // Mantener apretado (o clic derecho) marca un punto para ir ahi.
   M.map.on('contextmenu', e => { if(!M.nav) mapaLugar({lat:e.latlng.lat, lng:e.latlng.lng, nombre:'Punto elegido', dir:e.latlng.lat.toFixed(5) + ', ' + e.latlng.lng.toFixed(5)}); });
   new ResizeObserver(() => { const s = document.getElementById('mapaSheet'); document.getElementById('mapa').style.setProperty('--sheet-h', s.offsetHeight + 'px'); }).observe(document.getElementById('mapaSheet'));
@@ -1088,6 +1125,8 @@ function mapaAbrir(op = {}){
   if(!mapaInit()) return;
   const el = document.getElementById('mapa'), yaAbierto = mapaVisible();
   el.hidden = false; document.body.classList.add('con-mapa'); cerrarMenu();
+  try{ if(window.Android && Android.mapaAbierto) Android.mapaAbierto(true); }catch(e){}
+  document.getElementById('mapaMinBtn').hidden = !(window.Android && Android.minimizar);
   if(!yaAbierto) try{ history.pushState({mapa:1}, ''); }catch(e){}
   document.getElementById('mapaChips').innerHTML = CERCA.map(c => `<button class="mchip" data-a="mapaCerca" data-id="${c.k}">${ic(c.i, 15)}${c.l}</button>`).join('');
   mapaLimpiar(); document.getElementById('mapaQ').value = ''; M.seguir = !(op.lugar || op.recorrido || op.cerca || op.buscar);
@@ -1097,9 +1136,11 @@ function mapaAbrir(op = {}){
   else if(op.recorrido) mapaRecorrido(op.recorrido);
   else if(op.cerca) mapaCerca(op.cerca);
   else if(op.buscar) mapaBuscar(op.buscar, op.nombre, op.ir);
-  mapaFab();
+  mapaFab(); mapaRumboUI(); mapaOdo();
 }
 function mapaCerrar(){
+  try{ if(window.Android && Android.mapaAbierto) Android.mapaAbierto(false); }catch(e){}
+  clearTimeout(M.volverT);
   navFin(true); mapaLimpiar();
   if(M.watch != null){ navigator.geolocation.clearWatch(M.watch); M.watch = null; }
   document.getElementById('mapa').hidden = true; document.body.classList.remove('con-mapa');
@@ -1109,7 +1150,7 @@ function mapaCerrar(){
 addEventListener('popstate', () => { if(mapaVisible()) mapaCerrar(); });
 function mapaSeguirPos(){
   if(gpsOn() || M.watch != null || !('geolocation' in navigator) || !window.isSecureContext) return;
-  M.watch = navigator.geolocation.watchPosition(p => { const c = p.coords; G.pos = {lat:c.latitude, lng:c.longitude, acc:c.accuracy, speed:c.speed, t:Date.now()}; mapaPos(); },
+  M.watch = navigator.geolocation.watchPosition(p => { G.pos = posGps(p.coords, Date.now()); mapaPos(); },
     e => { if(e.code === 1) toast('Sin permiso de ubicación: el mapa no puede mostrar dónde estás.', true); },
     {enableHighAccuracy:true, maximumAge:3000, timeout:30000});
 }
@@ -1119,18 +1160,65 @@ function mapaPos(){
   const p = G.pos, ll = [p.lat, p.lng], primera = !M.yo;
   if(primera){
     M.yoAcc = L.circle(ll, {radius:p.acc || 0, interactive:false, color:AZUL, weight:1, opacity:.4, fillColor:AZUL, fillOpacity:.12}).addTo(M.map);
-    M.yo = L.marker(ll, {icon:L.divIcon({className:'', html:'<div class="m-yo"></div>', iconSize:[22, 22], iconAnchor:[11, 11]}), interactive:false, zIndexOffset:1000}).addTo(M.map);
+    M.yo = L.marker(ll, {icon:iconoYo(false), interactive:false, zIndexOffset:1000}).addTo(M.map); M.yoFlecha = false;
   } else { M.yo.setLatLng(ll); M.yoAcc.setLatLng(ll).setRadius(p.acc || 0); }
+  if(p.rumbo != null && !M.yoFlecha){ M.yo.setIcon(iconoYo(true)); M.yoFlecha = true; }
   const a = S.gpsActivo;
   if(gpsOn() && a && a.puntos.length > 1){
     const pts = a.puntos.map(x => [x[0], x[1]]).concat([ll]);
     if(M.vivo) M.vivo.setLatLngs(pts); else M.vivo = L.polyline(pts, {color:VERDE, weight:5, opacity:.8, interactive:false}).addTo(M.map);
   }
-  if(M.seguir) M.nav ? M.map.setView(ll, Math.max(M.map.getZoom(), 17)) : (primera ? M.map.setView(ll, 16) : M.map.panTo(ll));
+  if(M.seguir){
+    M.nav ? M.map.setView(ll, Math.max(M.map.getZoom(), 17)) : (primera ? M.map.setView(ll, 16) : M.map.panTo(ll));
+    if(M.rumboAuto && p.rumbo != null) girarMapa(-p.rumbo);
+  }
+  mapaRumboUI(); mapaOdo();
   if(M.pendiente){ const [d, m] = M.pendiente; M.pendiente = null; mapaRuta(d, m); }
   if(M.nav) navPaso();
   mapaFab();
 }
+const FLECHA = '<svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="#fff"/><path d="M17 5l8.5 21L17 21.5 8.5 26z" fill="#2A78D6" stroke="#2A78D6" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+const iconoYo = flecha => flecha ? L.divIcon({className:'', html:'<div class="m-flecha">' + FLECHA + '</div>', iconSize:[34, 34], iconAnchor:[17, 17]})
+  : L.divIcon({className:'', html:'<div class="m-yo"></div>', iconSize:[22, 22], iconAnchor:[11, 11]});
+const giroMapa = () => M.map && M.map.getBearing ? M.map.getBearing() : 0;
+// Gira el mapa de a poco hasta el angulo pedido (por el lado mas corto), asi no salta en cada lectura del GPS.
+function girarMapa(b){
+  if(!M.map || !M.map.setBearing) return;
+  M.giroObj = (b + 360) % 360;
+  if(document.hidden){ M.map.setBearing(M.giroObj); return; }
+  if(M.giroRaf && Date.now() - M.giroT < 1000) return;
+  const paso = () => {
+    M.giroT = Date.now();
+    const act = giroMapa(), d = ((M.giroObj - act + 540) % 360) - 180;
+    if(Math.abs(d) < .5){ M.map.setBearing(M.giroObj); M.giroRaf = 0; return; }
+    M.map.setBearing(act + d * .18); M.giroRaf = requestAnimationFrame(paso);
+  };
+  M.giroT = Date.now(); M.giroRaf = requestAnimationFrame(paso);
+}
+// Flecha del auto y brujula siempre apuntando bien aunque el mapa este girado.
+function mapaRumboUI(){
+  const g = giroMapa(), b = document.getElementById('mapaRumboBtn');
+  if(b){ b.style.setProperty('--rot', g + 'deg'); b.classList.toggle('on', M.rumboAuto); b.title = M.rumboAuto ? 'El mapa gira con el auto (tocá para norte arriba)' : 'Norte arriba (tocá para que gire con el auto)'; }
+  const f = M.yo && M.yoFlecha && M.yo.getElement() && M.yo.getElement().querySelector('.m-flecha');
+  if(f && G.pos && G.pos.rumbo != null) f.style.setProperty('--rot', (G.pos.rumbo + g) + 'deg');
+}
+// Odometro dentro del mapa (y en la ventanita): kilometraje del auto en vivo + velocidad.
+function mapaOdo(){
+  const el = document.getElementById('mapaOdo'); if(!el || !mapaVisible()) return;
+  const v = V(); if(!v){ el.hidden = true; return; }
+  const a = S.gpsActivo && S.gpsActivo.vid === v.id ? S.gpsActivo : null;
+  const vel = G.pos && G.pos.speed != null && Date.now() - G.pos.t < 15000 ? Math.max(0, Math.round(G.pos.speed * 3.6)) : null;
+  const sub = a ? `<span class="${gpsOn() ? 'rec' : ''}">${gpsOn() ? '● ' : 'En pausa · '}${fDist(a.dist)} este viaje</span>` : `<span>${esc(vNombre(v))} · GPS sin contar</span>`;
+  el.hidden = false;
+  el.innerHTML = `<div class="vel"><div>${vel == null ? '—' : vel}<small>km/h</small></div></div><div><b>${fKm(a ? a.base + a.dist / 1000 : kmActual(v))}</b>${sub}</div>`;
+}
+// Android avisa cuando la app pasa a ventanita flotante (imagen en imagen) o vuelve a pantalla completa.
+window.modoPip = on => {
+  document.body.classList.toggle('pip', !!on);
+  if(!M.map || !mapaVisible()) return;
+  if(on){ clearTimeout(M.volverT); M.seguir = true; }
+  setTimeout(() => { M.map.invalidateSize(); mapaPos(); }, 120);
+};
 function mapaSheet(html){ document.getElementById('mapaSheet').innerHTML = html; }
 // Encuadra dejando a la vista lo que tapa la barra de busqueda (arriba) y el panel (abajo).
 function encuadrar(b, maxZoom = 17){ M.seguir = false; mapaFab(); M.map.fitBounds(b, {paddingTopLeft:[24, 120], paddingBottomRight:[24, document.getElementById('mapaSheet').offsetHeight + 24], maxZoom}); }
@@ -1375,6 +1463,21 @@ function hav(a, b){
   return 2 * 6371000 * Math.asin(Math.sqrt(x));
 }
 const gpsOn = () => G.watch != null;
+// Rumbo en grados desde el norte (sentido horario) entre dos puntos.
+function rumboEntre(a, b){
+  const f1 = a.lat * RAD, f2 = b.lat * RAD, dl = (b.lng - a.lng) * RAD;
+  return (Math.atan2(Math.sin(dl) * Math.cos(f2), Math.cos(f1) * Math.sin(f2) - Math.sin(f1) * Math.cos(f2) * Math.cos(dl)) / RAD + 360) % 360;
+}
+// Posicion nueva con rumbo: el que da el GPS si vas andando; si no, el calculado contra el ultimo punto
+// alejado unos metros (parado el GPS tiembla y el rumbo daria cualquier cosa, entonces se mantiene el anterior).
+function posGps(c, t){
+  const prev = G.pos, p = {lat:c.latitude, lng:c.longitude, acc:c.accuracy, speed:c.speed, t, rumbo:prev ? prev.rumbo : null, ref:prev ? prev.ref : null};
+  const movio = !p.ref || hav(p.ref, p) > Math.max(8, Math.min(c.accuracy || 0, 30) * .5);
+  if(c.heading != null && !isNaN(c.heading) && c.speed > 1.5) p.rumbo = c.heading;
+  else if(p.ref && movio && c.accuracy < 40 && !(c.speed != null && c.speed < .8)) p.rumbo = rumboEntre(p.ref, p);
+  if(movio) p.ref = {lat:p.lat, lng:p.lng};
+  return p;
+}
 const fDist = m => m < 1000 ? Math.round(m) + ' m' : nf2.format(m / 1000) + ' km';
 function fDur(s){ s = Math.max(0, Math.round(s)); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60); return h ? `${h} h ${String(m).padStart(2, '0')} min` : `${m} min ${String(s % 60).padStart(2, '0')} s`; }
 function fFH(ts){ const d = new Date(ts); return fF(iso(d)) + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
@@ -1402,7 +1505,7 @@ function gpsDetener(){
 }
 function gpsPos(p){
   const c = p.coords, pt = {lat:c.latitude, lng:c.longitude, t:p.timestamp || Date.now()};
-  G.pos = {...pt, acc:c.accuracy, speed:c.speed}; G.err = ''; mapaPos();
+  G.pos = posGps(c, pt.t); G.err = ''; mapaPos();
   const a = S.gpsActivo; if(!a || !gpsOn()) return;
   if(c.accuracy > 50) return gpsLive();               // señal mala: no se cuenta
   if(!a.last){ a.last = pt; a.puntos.push([+pt.lat.toFixed(6), +pt.lng.toFixed(6)]); persistir(); return gpsLive(); }
@@ -1429,7 +1532,7 @@ function gpsLive(){
   if(a){
     const s = (Date.now() - a.inicio) / 1000, km = a.dist / 1000;
     set('gpsSideTxt', nf1.format(km) + ' km'); set('gpsDist', fDist(a.dist)); set('gpsOdo', fKm(a.base + km));
-    set('gpsTiempo', fDur(s)); set('gpsProm', s > 60 && km > .05 ? nf.format(Math.round(km / (s / 3600))) + ' km/h' : '—');
+    mapaOdo(); set('gpsTiempo', fDur(s)); set('gpsProm', s > 60 && km > .05 ? nf.format(Math.round(km / (s / 3600))) + ' km/h' : '—');
   }
   if(G.pos){
     set('gpsVel', G.pos.speed != null ? nf.format(Math.round(G.pos.speed * 3.6)) + ' km/h' : '—');
@@ -1844,6 +1947,8 @@ const A = {
   mapaVoz:() => { M.voz = !M.voz; if(!M.voz) try{ speechSynthesis.cancel(); }catch(e){} navPaso(); },
   mapaCapa:() => { M.map.removeLayer(M.capas[M.capa]); M.capa = M.capa === 'calles' ? 'satelite' : 'calles'; M.capas[M.capa].addTo(M.map);
     const b = document.getElementById('mapaCapaBtn'), t = M.capa === 'calles' ? 'Ver satélite' : 'Ver mapa de calles'; b.title = t; b.setAttribute('aria-label', t); },
+  mapaRumbo:() => { M.rumboAuto = !M.rumboAuto; if(M.rumboAuto && G.pos && G.pos.rumbo != null){ M.seguir = true; mapaPos(); } else if(!M.rumboAuto) girarMapa(0); mapaRumboUI(); mapaFab(); },
+  mapaMinimizar:() => { try{ Android.minimizar(); }catch(e){ toast('No se pudo achicar la app', true); } },
   mapaYo:() => { M.seguir = true; mapaSeguirPos(); if(G.pos) M.map.setView([G.pos.lat, G.pos.lng], Math.max(M.map.getZoom(), 16)); else toast('Buscando tu ubicación…'); mapaFab(); },
   mapaLimpiar:() => { if(!M.nav) mapaLimpiar(); },
   verViaje:(id) => { const x = S.viajes.find(v => v.id === id); if(x) mapaAbrir({recorrido:x}); },

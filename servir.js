@@ -5,7 +5,7 @@ const http = require('http'), https = require('https'), fs = require('fs'), path
 const DIR = __dirname, HTTP_PORT = 8080, HTTPS_PORT = 8443;
 const TIPOS = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.apk': 'application/vnd.android.package-archive' };
 // Solo se sirve la app, Leaflet y el APK (nunca la clave de firma ni el certificado).
-const PERMITIDOS = /^\/(AutoControl\.html|AutoControl\.apk|lib\/leaflet\.(js|css))$/;
+const PERMITIDOS = /^\/(AutoControl\.html|AutoControl\.apk|lib\/leaflet(\.js|\.css|-rotate\.js))$/;
 
 function app(req, res) {
   let p = decodeURIComponent(req.url.split('?')[0]);

@@ -67,6 +67,20 @@ Hoy web y APK funcionan por separado (cada una con su `localStorage`). Para sinc
 Mezcla prevista: por cada id gana el `mod` más nuevo; si `borrados[id]` es más nuevo que `mod`, se borra.
 Falta decidir el transporte (archivo/QR, Google Drive, o un servidor propio). Los adjuntos (IndexedDB) van aparte.
 
+## 18/10/2026 — Versión 1.2 (pedidos después de probar en el celular)
+
+- **El mapa gira con el auto** (rumbo arriba), con el plugin `lib/leaflet-rotate.js` (0.2.8, local para la APK).
+  El rumbo sale del GPS (`coords.heading`) o se calcula entre posiciones (`posGps`); parado se mantiene.
+  Botón brújula: alterna "gira con el auto" / "norte arriba". El punto azul pasa a flecha.
+  Manejando (navegación o GPS contando), si movés el mapa con el dedo vuelve solo a seguir al auto a los 15 s.
+- **Odómetro dentro del mapa** (abajo a la izquierda): velocidad + km del auto en vivo (+ km del viaje si el GPS cuenta).
+- **Ventanita flotante (solo APK, Android 8+)**: "imagen en imagen". Con el mapa abierto, al apretar Inicio
+  la app se achica sola (y hay un botón para achicarla). Muestra mapa, odómetro y la próxima indicación.
+  Java: `Android.mapaAbierto(bool)`, `Android.minimizar()`; Android llama a `modoPip(bool)` y la página usa `body.pip`.
+  En la web no se puede (Chrome de Android no deja hacer ventanita con una página).
+- Prueba: `node pruebas/giro-test.js [pip 0/1] [nav]` genera `t-giro.html` y se captura con `pruebas/shot.js`.
+- Sin probar en un celular real todavía: la ventanita y que el GPS siga andando dentro de ella.
+
 ## Comandos útiles
 
 ```bash

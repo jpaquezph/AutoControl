@@ -7,3 +7,6 @@ android/build/
 *.apk
 *.apk.idsig
 pruebas/prof-*/
+
+# Pruebas generadas
+t-*.html

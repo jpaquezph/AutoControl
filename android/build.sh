@@ -19,7 +19,7 @@ rm -rf "$OUT" && mkdir -p "$OUT/gen" "$OUT/classes" "$OUT/assets/www/lib"
 
 # La app web va dentro del APK como assets/www/index.html
 cp "$RAIZ/AutoControl.html" "$OUT/assets/www/index.html"
-cp "$RAIZ/lib/leaflet.js" "$RAIZ/lib/leaflet.css" "$OUT/assets/www/lib/"
+cp "$RAIZ/lib/leaflet.js" "$RAIZ/lib/leaflet.css" "$RAIZ/lib/leaflet-rotate.js" "$OUT/assets/www/lib/"
 
 echo "› recursos"
 "$BT/aapt2.exe" compile --dir "$AQUI/res" -o "$OUT/res.zip"

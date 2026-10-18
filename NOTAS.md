@@ -77,3 +77,11 @@ bash android/build.sh
 openssl req -x509 -newkey rsa:2048 -nodes -days 825 -keyout cert/key.pem -out cert/cert.pem \
   -subj "/CN=AutoControl" -addext "subjectAltName=IP:192.168.0.181,DNS:localhost"
 ```
+
+## Repositorio y versiones
+
+GitHub (privado): https://github.com/jpaquezph/AutoControl
+- `main` siempre en la última versión; una rama `vX.Y` por versión (hoy `v1.1`).
+- Versión nueva: subir `APP_VERSION` en `AutoControl.html`, crear la rama `vX.Y`, trabajar ahí,
+  y al cerrarla llevarla a `main`. `build.sh` toma la versión del HTML.
+- No están en el repo (a propósito): `android/autocontrol.keystore`, `cert/` y los `.apk`.

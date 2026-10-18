@@ -1,0 +1,9 @@
+# Secretos: NO subir
+android/autocontrol.keystore
+cert/
+
+# Generados
+android/build/
+*.apk
+*.apk.idsig
+pruebas/prof-*/

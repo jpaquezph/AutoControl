@@ -1,0 +1,57 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:transparent}svg{display:block}</style></head>
+<body>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fondo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6FD0F7"/>
+      <stop offset=".55" stop-color="#2FA6E6"/>
+      <stop offset="1" stop-color="#1A7FCC"/>
+    </linearGradient>
+    <linearGradient id="ruta" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#EF5A4F"/>
+      <stop offset="1" stop-color="#C9302A"/>
+    </linearGradient>
+    <linearGradient id="brillo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".28"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="forma"><rect x="32" y="32" width="960" height="960" rx="230"/></clipPath>
+    <filter id="sombra" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#0B3D66" flood-opacity=".35"/></filter>
+  </defs>
+
+  <g clip-path="url(#forma)">
+    <rect x="32" y="32" width="960" height="960" fill="url(#fondo)"/>
+    <!-- arco de velocímetro de fondo -->
+    <path d="M 172 600 A 340 340 0 0 1 852 600" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="30" stroke-linecap="round"/>
+    <g stroke="#fff" stroke-opacity=".35" stroke-width="14" stroke-linecap="round">
+      <path d="M 222 430 L 254 448"/><path d="M 330 312 L 350 342"/><path d="M 512 262 L 512 298"/><path d="M 694 312 L 674 342"/><path d="M 802 430 L 770 448"/>
+    </g>
+    <!-- ruta roja que cruza -->
+    <path d="M -20 800 C 300 770, 640 730, 1050 630" fill="none" stroke="url(#ruta)" stroke-width="96" stroke-linecap="round"/>
+    <path d="M 60 793 C 340 766, 640 730, 980 646" fill="none" stroke="#fff" stroke-opacity=".9" stroke-width="12" stroke-linecap="round" stroke-dasharray="44 40"/>
+    <!-- brillo superior -->
+    <rect x="32" y="32" width="960" height="420" fill="url(#brillo)"/>
+  </g>
+
+  <!-- líneas de velocidad -->
+  <g stroke-linecap="round" stroke-width="26">
+    <path d="M 96 470 L 214 456" stroke="#fff" stroke-opacity=".85"/>
+    <path d="M 60 548 L 200 532" stroke="#E4483F"/>
+    <path d="M 120 626 L 216 614" stroke="#fff" stroke-opacity=".6"/>
+  </g>
+
+  <!-- auto, inclinado hacia adelante -->
+  <g transform="rotate(-6 520 560)" filter="url(#sombra)">
+    <path d="M 252 604 L 252 548 Q 252 510 290 504 L 368 494 L 440 414 Q 456 396 482 396 L 622 396 Q 652 396 672 418 L 742 494 L 786 502 Q 818 510 818 548 L 818 604 Q 818 622 800 622 L 270 622 Q 252 622 252 604 Z" fill="#fff"/>
+    <path d="M 404 492 L 458 428 Q 466 420 478 420 L 532 420 L 532 492 Z" fill="#2FA6E6"/>
+    <path d="M 556 420 L 616 420 Q 634 420 646 434 L 700 492 L 556 492 Z" fill="#2FA6E6"/>
+    <path d="M 252 540 L 300 540" stroke="#E4483F" stroke-width="18" stroke-linecap="round"/>
+    <path d="M 770 540 L 818 540" stroke="#FFD34D" stroke-width="18" stroke-linecap="round"/>
+    <circle cx="372" cy="622" r="62" fill="#163A5C" stroke="#fff" stroke-width="14"/>
+    <circle cx="372" cy="622" r="20" fill="#fff"/>
+    <circle cx="700" cy="622" r="62" fill="#163A5C" stroke="#fff" stroke-width="14"/>
+    <circle cx="700" cy="622" r="20" fill="#fff"/>
+  </g>
+</svg>
+</body></html>

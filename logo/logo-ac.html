@@ -1,0 +1,43 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:transparent}svg{display:block}</style></head>
+<body>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fondo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6FD0F7"/>
+      <stop offset=".55" stop-color="#2FA6E6"/>
+      <stop offset="1" stop-color="#1A7FCC"/>
+    </linearGradient>
+    <linearGradient id="rojo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F2675C"/>
+      <stop offset="1" stop-color="#D2352C"/>
+    </linearGradient>
+    <linearGradient id="brillo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".25"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="forma"><rect x="32" y="32" width="960" height="960" rx="230"/></clipPath>
+    <filter id="sombra" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#0B3D66" flood-opacity=".3"/></filter>
+    <!-- La C "corta" a la A: un hueco del color del fondo entre las dos letras -->
+    <mask id="hueco" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">
+      <rect width="1024" height="1024" fill="#fff"/>
+      <path id="cHueco" d="M 768 404 A 168 168 0 1 0 768 644" fill="none" stroke="#000" stroke-width="150" stroke-linecap="round"/>
+    </mask>
+  </defs>
+
+  <g clip-path="url(#forma)">
+    <rect x="32" y="32" width="960" height="960" fill="url(#fondo)"/>
+    <rect x="32" y="32" width="960" height="440" fill="url(#brillo)"/>
+  </g>
+
+  <g transform="translate(-12 0) skewX(-8) translate(72 0)" filter="url(#sombra)">
+    <!-- A: dos trazos como una ruta que se pierde en el horizonte, travesaño rojo -->
+    <path d="M 250 604 L 454 604" stroke="#E4483F" stroke-width="58" stroke-linecap="round"/>
+    <path d="M 210 752 L 352 282 L 494 752" fill="none" stroke="#fff" stroke-width="100" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- C: velocímetro en rojo con aguja -->
+    <path d="M 812 410 A 150 150 0 1 0 812 622" fill="none" stroke="url(#rojo)" stroke-width="100" stroke-linecap="round"/>
+    <path d="M 706 516 L 774 452" stroke="#fff" stroke-width="30" stroke-linecap="round"/>
+    <circle cx="706" cy="516" r="30" fill="#fff"/>
+  </g>
+</svg>
+</body></html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:transparent}svg{display:block}</style></head>
+<body>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fondo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#143A63"/>
+      <stop offset="1" stop-color="#0A1B31"/>
+    </linearGradient>
+    <linearGradient id="celeste" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6CCFF6"/>
+      <stop offset="1" stop-color="#2196E0"/>
+    </linearGradient>
+    <clipPath id="forma"><rect x="32" y="32" width="960" height="960" rx="224"/></clipPath>
+    <!-- las patas de la A terminan en corte horizontal -->
+    <clipPath id="pie"><rect x="0" y="0" width="1024" height="730"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#forma)">
+    <rect x="32" y="32" width="960" height="960" fill="url(#fondo)"/>
+  </g>
+
+  <!-- C: aro de velocímetro, abierto a la derecha -->
+  <path d="M 741.8 319.2 A 300 300 0 1 0 741.8 704.8" fill="none" stroke="url(#celeste)" stroke-width="58"/>
+  <!-- marcas del velocímetro -->
+  <g stroke="#fff" stroke-opacity=".28" stroke-width="10">
+    <path d="M 326.7 326.7 L 347.9 347.9"/>
+    <path d="M 250 512 L 280 512"/>
+    <path d="M 326.7 697.3 L 347.9 676.1"/>
+  </g>
+
+  <!-- travesaño de la A que sale como aguja por la abertura de la C -->
+  <path d="M 440 552 L 820 552 L 870 576 L 820 600 L 440 600 Z" fill="#E4483F"/>
+  <!-- A -->
+  <g clip-path="url(#pie)">
+    <path d="M 370 790 L 512 382 L 654 790" fill="none" stroke="#fff" stroke-width="66" stroke-linejoin="miter" stroke-miterlimit="10"/>
+  </g>
+</svg>
+</body></html>

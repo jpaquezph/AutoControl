@@ -1,0 +1,57 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:transparent}svg{display:block}</style></head>
+<body>
+<svg id="s" width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fondo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#153D68"/>
+      <stop offset="1" stop-color="#091729"/>
+    </linearGradient>
+    <radialGradient id="halo" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#3FA9F5" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#3FA9F5" stop-opacity="0"/>
+    </radialGradient>
+    <!-- el aro se va encendiendo hacia la abertura, como la aguja subiendo -->
+    <linearGradient id="aro" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#1E7FD0"/>
+      <stop offset=".5" stop-color="#3BA8EE"/>
+      <stop offset="1" stop-color="#7AD6FA"/>
+    </linearGradient>
+    <linearGradient id="aguja" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#C7312A"/>
+      <stop offset="1" stop-color="#F0584D"/>
+    </linearGradient>
+    <clipPath id="forma"><rect x="32" y="32" width="960" height="960" rx="224"/></clipPath>
+    <clipPath id="pie"><rect x="0" y="0" width="1024" height="738"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#forma)">
+    <rect x="32" y="32" width="960" height="960" fill="url(#fondo)"/>
+    <circle cx="512" cy="512" r="420" fill="url(#halo)"/>
+  </g>
+
+  <!-- pista fina completa y aro grueso (la C) -->
+  <circle cx="512" cy="512" r="318" fill="none" stroke="#7AD6FA" stroke-opacity=".14" stroke-width="6"/>
+  <path d="M 755.6 307.6 A 318 318 0 1 0 755.6 716.4" fill="none" stroke="url(#aro)" stroke-width="54"/>
+  <!-- escala del velocímetro (se genera abajo) -->
+  <g id="escala" stroke="#fff" stroke-linecap="butt"></g>
+
+  <!-- travesaño de la A = aguja roja que sale por la abertura -->
+  <path d="M 440 556 L 842 556 L 896 578 L 842 600 L 440 600 Z" fill="url(#aguja)"/>
+  <!-- A -->
+  <g clip-path="url(#pie)">
+    <path d="M 366 800 L 512 380 L 658 800" fill="none" stroke="#fff" stroke-width="70" stroke-linejoin="miter" stroke-miterlimit="10"/>
+  </g>
+</svg>
+<script>
+// Marcas de la escala por dentro del aro, del lado cerrado de la C (cada 10°, más largas cada 40°)
+const g = document.getElementById('escala'), R = 318 - 27 - 14;
+for (let a = 130; a <= 230; a += 10) {
+  const larga = (a - 140) % 40 === 0, len = larga ? 30 : 14, rad = a * Math.PI / 180;
+  const x1 = 512 + R * Math.cos(rad), y1 = 512 + R * Math.sin(rad), x2 = 512 + (R - len) * Math.cos(rad), y2 = 512 + (R - len) * Math.sin(rad);
+  const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  p.setAttribute('d', `M ${x1} ${y1} L ${x2} ${y2}`); p.setAttribute('stroke-width', larga ? 9 : 6); p.setAttribute('stroke-opacity', larga ? .45 : .28);
+  g.appendChild(p);
+}
+</script>
+</body></html>

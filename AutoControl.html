@@ -54,7 +54,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 /* ---------- Barra lateral ---------- */
 .side{width:250px;flex:none;background:var(--surf);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
 .brand{display:flex;align-items:center;gap:10px;padding:20px 18px 12px}
-.brand-logo{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--dash),color-mix(in srgb,var(--dash) 55%,#000))}
+.brand-logo{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,#153D68,#091729);overflow:hidden}
 .brand b{font-size:17px;display:block;line-height:1.1}
 .brand small{color:var(--tx3);font-size:12px}
 .side-veh{margin:6px 14px 10px;padding:12px;border-radius:var(--r);background:var(--surf2);display:flex;flex-direction:column;gap:8px}
@@ -410,7 +410,9 @@ body.con-mapa .app,body.con-mapa .topbar{visibility:hidden}
 "use strict";
 /* ================== Datos ================== */
 // Versión de la app: única fuente; android/build.sh la usa como versionName del APK.
-const APP_VERSION = '1.2';
+const APP_VERSION = '1.3';
+// Logo (el mismo del ícono de la APK, logo/logo-pro2): C celeste de velocímetro, A blanca y la aguja roja.
+const LOGO = '<svg width="34" height="34" viewBox="150 150 760 724" aria-hidden="true"><path d="M 755.6 307.6 A 318 318 0 1 0 755.6 716.4" fill="none" stroke="#4FB8F2" stroke-width="58"/><path d="M 440 556 L 842 556 L 896 578 L 842 600 L 440 600 Z" fill="#E4483F"/><path d="M 373 738 L 512 338 L 651 738 L 578 738 L 512 545 L 446 738 Z" fill="#fff"/></svg>';
 const KEY = 'autocontrol.v1';
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 const COLS = ['vehiculos','km','plan','historial','combustible','patentes','papeles','mecanicos','gastos','viajes'];
@@ -2000,7 +2002,7 @@ function applyTheme(){ const r = document.documentElement; if(S.tema === 'claro'
 function renderSide(){
   const v = V(), venc = v ? vencimientos().filter(x => x.estado === 'vencido') : [];
   const cnt = {papeles:venc.filter(x => x.sec === 'papeles').length, patentes:venc.filter(x => x.sec === 'patentes').length, service:venc.filter(x => x.sec === 'service').length};
-  document.getElementById('side').innerHTML = `<div class="brand"><span class="brand-logo">${ic('car', 22)}</span><div><b>AutoControl</b><small>El auto, en orden</small></div></div>
+  document.getElementById('side').innerHTML = `<div class="brand"><span class="brand-logo">${LOGO}</span><div><b>AutoControl</b><small>El auto, en orden</small></div></div>
     ${v ? `<div class="side-veh">${plate(v.patente, 1)}<div><div class="name">${esc(vNombre(v))}</div><div class="km">${fKm(kmActual(v))}</div></div>
       ${S.vehiculos.length > 1 ? `<select id="selV" aria-label="Vehículo activo">${S.vehiculos.map(x => `<option value="${esc(x.id)}" ${x.id === v.id ? 'selected' : ''}>${esc(vNombre(x))}${x.patente ? ' · ' + esc(fmtPatente(x.patente)) : ''}</option>`).join('')}</select>` : ''}</div>
       ${gpsOn() ? `<button class="gps-side on" data-a="ir" data-id="gps"><span class="pulse"></span> GPS activo · <span id="gpsSideTxt">${nf1.format(S.gpsActivo.dist / 1000)} km</span></button>`

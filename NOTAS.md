@@ -90,7 +90,8 @@ Falta decidir el transporte (archivo/QR, Google Drive, o un servidor propio). Lo
 En `logo/`: `logo-ac` (iniciales AC: A blanca con travesaño rojo y C roja con forma de velocímetro) y `logo-auto`
 (auto con ruta roja). Celeste + rojo. Los `.html` son la fuente (SVG): se pasan a PNG con Edge:
 `msedge --headless=new --default-background-color=00000000 --window-size=1024,1024 --screenshot=salida.png logo/logo-ac.html`
-El usuario se quedó trabajando el logo por su cuenta; la APK todavía usa el ícono violeta viejo.
+Elegido: **`logo-pro2`** (C celeste de velocímetro, A blanca, aguja roja, fondo azul marino). Desde la 1.3 es el
+ícono de la APK (`android/res/drawable-nodpi/icono.png`, 512 px) y el logo del menú (`LOGO` en AutoControl.html).
 
 ## Comandos útiles
 

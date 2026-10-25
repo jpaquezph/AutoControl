@@ -410,7 +410,7 @@ body.con-mapa .app,body.con-mapa .topbar{visibility:hidden}
 "use strict";
 /* ================== Datos ================== */
 // Versión de la app: única fuente; android/build.sh la usa como versionName del APK.
-const APP_VERSION = '1.3';
+const APP_VERSION = '1.4';
 // Logo (el mismo del ícono de la APK, logo/logo-pro2): C celeste de velocímetro, A blanca y la aguja roja.
 const LOGO = '<svg width="34" height="34" viewBox="150 150 760 724" aria-hidden="true"><path d="M 755.6 307.6 A 318 318 0 1 0 755.6 716.4" fill="none" stroke="#4FB8F2" stroke-width="58"/><path d="M 440 556 L 842 556 L 896 578 L 842 600 L 440 600 Z" fill="#E4483F"/><path d="M 373 738 L 512 338 L 651 738 L 578 738 L 512 545 L 446 738 Z" fill="#fff"/></svg>';
 const KEY = 'autocontrol.v1';
@@ -1217,10 +1217,18 @@ function mapaOdo(){
 // Android avisa cuando la app pasa a ventanita flotante (imagen en imagen) o vuelve a pantalla completa.
 window.modoPip = on => {
   document.body.classList.toggle('pip', !!on);
+  if(!on) escalaNormal();
   if(!M.map || !mapaVisible()) return;
   if(on){ clearTimeout(M.volverT); M.seguir = true; }
-  setTimeout(() => { M.map.invalidateSize(); mapaPos(); }, 120);
+  const ajustar = () => { M.map.invalidateSize(); mapaPos(); };
+  setTimeout(ajustar, 120); if(!on) setTimeout(ajustar, 700);
 };
+// Al salir de la ventanita el WebView puede quedar con zoom (todo grande): se fija la escala en 1 un momento.
+function escalaNormal(){
+  const m = document.querySelector('meta[name=viewport]'), orig = 'width=device-width, initial-scale=1';
+  m.setAttribute('content', orig + ', minimum-scale=1, maximum-scale=1');
+  setTimeout(() => m.setAttribute('content', orig), 1000);
+}
 function mapaSheet(html){ document.getElementById('mapaSheet').innerHTML = html; }
 // Encuadra dejando a la vista lo que tapa la barra de busqueda (arriba) y el panel (abajo).
 function encuadrar(b, maxZoom = 17){ M.seguir = false; mapaFab(); M.map.fitBounds(b, {paddingTopLeft:[24, 120], paddingBottomRight:[24, document.getElementById('mapaSheet').offsetHeight + 24], maxZoom}); }

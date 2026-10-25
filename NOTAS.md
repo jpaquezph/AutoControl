@@ -93,6 +93,13 @@ En `logo/`: `logo-ac` (iniciales AC: A blanca con travesaño rojo y C roja con f
 Elegido: **`logo-pro2`** (C celeste de velocímetro, A blanca, aguja roja, fondo azul marino). Desde la 1.3 es el
 ícono de la APK (`android/res/drawable-nodpi/icono.png`, 512 px) y el logo del menú (`LOGO` en AutoControl.html).
 
+## 25/10/2026 — Versión 1.4
+
+- **Arreglo: al volver de la ventanita quedaba todo grande** (zoom del WebView) hasta salir de la app.
+  Java: `setUseWideViewPort(true)` y, al salir de la ventanita, `zoomNormal()` (zoomOut hasta el mínimo, a los 300 y 900 ms).
+  Página: `escalaNormal()` fija un momento `maximum-scale=1` en el `<meta viewport>`, y el mapa se reacomoda otra vez a los 700 ms.
+- Sin probar en el celular todavía.
+
 ## Comandos útiles
 
 ```bash

@@ -70,6 +70,7 @@ public class MainActivity extends Activity {
         s.setGeolocationEnabled(true);
         s.setAllowFileAccess(false);
         s.setMediaPlaybackRequiresUserGesture(false);
+        s.setUseWideViewPort(true);   // respeta el <meta viewport> igual que Chrome (escala 1 fija)
 
         web.setWebViewClient(new WebViewClient() {
             @Override
@@ -221,6 +222,13 @@ public class MainActivity extends Activity {
     public void onPictureInPictureModeChanged(boolean pip, Configuration conf) {
         super.onPictureInPictureModeChanged(pip, conf);
         web.evaluateJavascript("window.modoPip && modoPip(" + pip + ")", null);
+        // Al achicarse, el WebView cambia su zoom para que entre la pagina y al volver lo deja asi
+        // (todo se ve grande). Se lo vuelve a la escala normal cuando ya tomo el tamano completo.
+        if (!pip) { web.postDelayed(this::zoomNormal, 300); web.postDelayed(this::zoomNormal, 900); }
+    }
+
+    private void zoomNormal() {
+        for (int k = 0; k < 30 && web.zoomOut(); k++) { }
     }
 
     @Override

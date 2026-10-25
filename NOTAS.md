@@ -98,7 +98,7 @@ Elegido: **`logo-pro2`** (C celeste de velocímetro, A blanca, aguja roja, fondo
 - **Arreglo: al volver de la ventanita quedaba todo grande** (zoom del WebView) hasta salir de la app.
   Java: `setUseWideViewPort(true)` y, al salir de la ventanita, `zoomNormal()` (zoomOut hasta el mínimo, a los 300 y 900 ms).
   Página: `escalaNormal()` fija un momento `maximum-scale=1` en el `<meta viewport>`, y el mapa se reacomoda otra vez a los 700 ms.
-- Sin probar en el celular todavía.
+- Probado en el celular el 25/10/2026: anda bien. Versión cerrada (tag `v1.4.0`).
 
 ## Comandos útiles
 
